@@ -1,0 +1,1353 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Portal del Vacío</title>
+
+<style>
+
+body{
+margin:0;
+background:black;
+overflow:hidden;
+font-family:'Courier New', monospace;
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+color:white;
+}
+
+/* portal grande */
+
+.portalContainer{
+position:absolute;
+width:400px;
+height:400px;
+display:flex;
+justify-content:center;
+align-items:center;
+z-index:10;
+}
+
+/* portalcito loco */
+
+.portalBg{
+position:absolute;
+width:400px;
+height:400px;
+border-radius:50%;
+background:
+radial-gradient(circle at center,
+black 40%,
+#001020 50%,
+#001a40 60%,
+#00aaff 70%,
+#66ddff 75%,
+rgba(0,200,255,0.5) 80%,
+transparent 85%);
+box-shadow:
+0 0 40px #00ccff,
+0 0 80px #00ccff,
+0 0 160px rgba(0,200,255,0.7),
+0 0 300px rgba(0,200,255,0.4);
+animation:
+portalForm 4s ease-out forwards,
+portalSpin 30s linear infinite,
+portalPulse 5s ease-in-out infinite;
+}
+
+@keyframes portalForm{
+0%{transform:scale(0);opacity:0}
+70%{transform:scale(1.1)}
+100%{transform:scale(1)}
+}
+
+@keyframes portalSpin{
+from{transform:rotate(0deg)}
+to{transform:rotate(360deg)}
+}
+
+@keyframes portalPulse{
+0%{
+box-shadow:
+0 0 40px #00ccff,
+0 0 80px #00ccff,
+0 0 160px rgba(0,200,255,0.7);
+}
+50%{
+box-shadow:
+0 0 70px #00ccff,
+0 0 140px #00ccff,
+0 0 250px rgba(0,200,255,0.9);
+}
+100%{
+box-shadow:
+0 0 40px #00ccff,
+0 0 80px #00ccff,
+0 0 160px rgba(0,200,255,0.7);
+}
+}
+
+/* vortex */
+@keyframes vortexSpin {
+    0% { transform: rotate(0deg) scale(1); }
+    50% { transform: rotate(180deg) scale(1.3); filter: hue-rotate(180deg); }
+    100% { transform: rotate(360deg) scale(1); filter: hue-rotate(360deg); }
+}
+
+.portalBg.vortex {
+    animation: vortexSpin 3s ease-in-out infinite !important;
+}
+
+/* caos */
+@keyframes caosShake {
+    0% { transform: translate(0, 0) rotate(0deg); }
+    10% { transform: translate(-8px, -8px) rotate(-5deg); }
+    20% { transform: translate(8px, -8px) rotate(5deg); }
+    30% { transform: translate(-8px, 8px) rotate(-5deg); }
+    40% { transform: translate(8px, 8px) rotate(5deg); }
+    50% { transform: translate(-8px, -8px) rotate(-5deg); }
+    60% { transform: translate(8px, -8px) rotate(5deg); }
+    70% { transform: translate(-8px, 8px) rotate(-5deg); }
+    80% { transform: translate(8px, 8px) rotate(5deg); }
+    90% { transform: translate(-8px, -8px) rotate(-5deg); }
+    100% { transform: translate(0, 0) rotate(0deg); }
+}
+
+.portalBg.caos {
+    animation: caosShake 0.15s infinite, portalPulse 0.3s infinite !important;
+    filter: hue-rotate(90deg) brightness(1.5);
+}
+
+/*minimilista*/
+.portalInput{
+position:relative;
+z-index:20;
+width:400px;
+text-align:center;
+}
+
+input{
+background:transparent;
+border:none;
+outline:none;
+color:rgba(255,255,255,0.9);
+font-family:'Courier New', monospace;
+font-size:24px;
+text-align:center;
+width:350px;
+padding:5px 0;
+letter-spacing:2px;
+}
+
+input::placeholder {
+    color: rgba(255,255,255,0.3);
+    font-family:'Courier New', monospace;
+    font-size:24px;
+    letter-spacing:2px;
+}
+
+/* ocultar barra */
+input:focus {
+    outline:none;
+}
+
+#mensaje{
+position:absolute;
+bottom:100px;
+font-size:28px;
+color:violet;
+text-shadow:0 0 15px violet;
+display:none;
+z-index:30;
+text-align:center;
+font-family:'Courier New', monospace;
+}
+
+#mensajeError{
+position:absolute;
+top:150px;
+font-size:20px;
+color:red;
+text-shadow:0 0 10px red;
+display:none;
+z-index:30;
+text-align:center;
+font-family:'Courier New', monospace;
+animation: parpadeoError 1s ease-in-out;
+}
+
+#mensajeCaos{
+position:absolute;
+top:100px;
+font-size:28px;
+color:red;
+text-shadow:0 0 20px red, 0 0 40px orange;
+display:none;
+z-index:30;
+text-align:center;
+font-family:'Courier New', monospace;
+animation: textoCaos 0.1s infinite;
+}
+
+@keyframes textoCaos {
+    0% { transform: skew(0deg); color: red; }
+    25% { transform: skew(5deg); color: orange; }
+    50% { transform: skew(-5deg); color: yellow; }
+    75% { transform: skew(5deg); color: purple; }
+    100% { transform: skew(0deg); color: red; }
+}
+
+canvas{
+position:absolute;
+top:0;
+left:0;
+width:100%;
+height:100%;
+z-index:1;
+}
+
+</style>
+</head>
+
+<body>
+
+<canvas id="glass"></canvas>
+
+<div class="portalContainer">
+<div class="portalBg"></div>
+<div class="portalInput">
+<input id="palabra" placeholder="..." onkeydown="enter(event)" autocomplete="off">
+</div>
+</div>
+
+<div id="mensaje">
+Ha desgarrado la propia realidad. Por favor, hay que detenerla.
+</div>
+
+<div id="mensajeError">
+Código incorrecto
+</div>
+
+<div id="mensajeCaos">
+🌀 Portal activándose 🌀
+</div>
+
+<!-- musica -->
+<audio autoplay loop id="audioPlayer">
+<source src="Fondo.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+
+const canvas = document.getElementById("glass")
+const ctx = canvas.getContext("2d")
+
+// configuración inicial del canvas
+canvas.width = window.innerWidth
+canvas.height = window.innerHeight
+
+let cx = canvas.width / 2
+let cy = canvas.height / 2
+
+// variables
+let modoCaos = false
+let modoVortex = false
+let intervaloCaos
+let mensajeTemporalMostrado = false
+
+//estrellas cayendo
+let stars = []
+function initStars() {
+    stars = []
+    for(let i = 0; i < 150; i++) {
+        stars.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            size: Math.random() * 2 + 0.5,
+            speed: 0.2 + Math.random() * 0.8, // velocidad de caída
+            brightness: 0.5 + Math.random() * 0.5
+        })
+    }
+}
+initStars()
+
+//simbolos cayendo
+const symbolsList = ["☉","☾","✶","⟁","⌬","∞","✦","⟡","☍","⚚","⚶","⚡","🌀","🌌","✨","⭐"]
+
+let symbols = []
+function initSymbols() {
+    symbols = []
+    for(let i = 0; i < 15; i++) { // límite de 15 símbolos
+        symbols.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height - canvas.height, // empiezan arriba
+            char: symbolsList[Math.floor(Math.random() * symbolsList.length)],
+            speed: 0.5 + Math.random() * 1.5, // velocidad de caída
+            rotation: Math.random() * Math.PI * 2,
+            rotationSpeed: (Math.random() - 0.5) * 0.02,
+            size: 16 + Math.random() * 12,
+            opacity: 0.5 + Math.random() * 0.4,
+            drift: (Math.random() - 0.5) * 0.3,
+            isSpecial: false
+        })
+    }
+}
+
+// símbolo especial de carta
+function spawnSpecialSymbol() {
+    if(symbols.length < 60) { // límite total de símbolos
+        symbols.push({
+            x: Math.random() * canvas.width,
+            y: -50, // empieza arriba
+            char: "💌",
+            speed: 0.8 + Math.random() * 0.7,
+            rotation: Math.random() * Math.PI * 2,
+            rotationSpeed: (Math.random() - 0.5) * 0.03,
+            size: 24 + Math.random() * 8,
+            opacity: 0.8 + Math.random() * 0.2,
+            drift: (Math.random() - 0.5) * 0.4,
+            isSpecial: true,
+            glowIntensity: 0
+        })
+    }
+}
+
+// spawnear carta especial cada 15-25 segundos
+setInterval(() => {
+    spawnSpecialSymbol()
+}, 15000 + Math.random() * 10000)
+initSymbols()
+
+// grietas
+let cracks = []
+let portalCracks = []
+
+function spawnCrack() {
+    if(cracks.length < 25) {
+        cracks.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            angle: Math.random() * Math.PI * 2,
+            length: 40 + Math.random() * 80,
+            life: 30
+        })
+    }
+}
+
+function spawnPortalCrack() {
+    if(portalCracks.length < 20) {
+        portalCracks.push({
+            angle: Math.random() * Math.PI * 2,
+            length: 80 + Math.random() * 120,
+            life: 30
+        })
+    }
+}
+
+setInterval(spawnCrack, 3500)
+setInterval(spawnPortalCrack, 2800)
+
+/* EFECTO CAOS */
+function spawnCaosCracks() {
+    if(!modoCaos) return
+    for(let i = 0; i < 4; i++) {
+        setTimeout(() => {
+            if(cracks.length < 35) {
+                cracks.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    angle: Math.random() * Math.PI * 2,
+                    length: 100 + Math.random() * 180,
+                    life: 18
+                })
+            }
+            if(portalCracks.length < 25) {
+                portalCracks.push({
+                    angle: Math.random() * Math.PI * 2,
+                    length: 150 + Math.random() * 220,
+                    life: 15
+                })
+            }
+        }, i * 70)
+    }
+}
+
+/* DIBUJO - CON ELEMENTOS CAYENDO (código original) */
+function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+    
+    // fondo oscuro
+    ctx.fillStyle = 'rgba(0,0,0,0.2)'
+    ctx.fillRect(0, 0, canvas.width, canvas.height)
+    
+    // actualizar centro
+    cx = canvas.width / 2
+    cy = canvas.height / 2
+    
+    // estrellas cayendo
+    stars.forEach(star => {
+        // caída hacia abajo
+        star.y += star.speed * (modoCaos ? 2 : 1)
+        
+        // reaparecer arriba
+        if(star.y > canvas.height) {
+            star.y = 0
+            star.x = Math.random() * canvas.width
+        }
+        
+        // dibujar estrella
+        ctx.fillStyle = modoCaos ? 
+            `hsl(${Math.random()*360}, 100%, 70%)` : 
+            `rgba(255, 255, 255, ${star.brightness})`
+        ctx.beginPath()
+        ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2)
+        ctx.fill()
+    })
+    
+    // símbolos cayendo
+    symbols.forEach(s => {
+        if(modoVortex) {
+            // vortex
+            let dx = cx - s.x
+            let dy = cy - s.y
+            s.x += dx * 0.015
+            s.y += dy * 0.015
+            s.rotation += 0.03
+        } else if(modoCaos) {
+            // caos
+            s.x += (Math.random() - 0.5) * 10
+            s.y += (Math.random() - 0.5) * 8
+            s.rotation += (Math.random() - 0.5) * 0.15
+            
+            // mantener en pantalla
+            s.x = Math.max(0, Math.min(canvas.width, s.x))
+            s.y = Math.max(0, Math.min(canvas.height, s.y))
+        } else {
+            //  caída hacia abajo 
+            s.y += s.speed
+            s.x += s.drift
+            s.rotation += s.rotationSpeed
+            
+            // reaparecer arriba
+            if(s.y > canvas.height + 50) {
+                s.y = -50
+                s.x = Math.random() * canvas.width
+                s.char = symbolsList[Math.floor(Math.random() * symbolsList.length)]
+                s.speed = 0.5 + Math.random() * 1.5
+            }
+        }
+        
+        // dibujar símbolo
+        ctx.save()
+        ctx.translate(s.x, s.y)
+        ctx.rotate(s.rotation)
+        
+        let opacity = modoCaos ? 0.9 : s.opacity
+        let hue = modoCaos ? Math.random() * 360 : 200
+        
+        // efecto especial para la carta
+        if(s.isSpecial) {
+            s.glowIntensity = Math.sin(Date.now() * 0.003) * 0.5 + 0.5
+            ctx.fillStyle = `rgba(255, 255, 255, ${opacity})` // blanco brillante
+            ctx.shadowColor = `rgba(255, 215, 0, ${0.5 + s.glowIntensity * 0.5})` // dorado brillante
+            ctx.shadowBlur = 20 + s.glowIntensity * 15
+            ctx.font = `${s.size * (1 + s.glowIntensity * 0.1)}px 'Courier New', monospace`
+        } else {
+            ctx.fillStyle = modoCaos ? 
+                `hsl(${hue}, 100%, 60%)` : 
+                `rgba(180, 220, 255, ${opacity})`
+            
+            ctx.shadowColor = modoCaos ? 
+                `hsl(${hue}, 100%, 50%)` : 
+                'rgba(100, 180, 255, 0.5)'
+            ctx.shadowBlur = 12
+            ctx.font = `${s.size}px 'Courier New', monospace`
+        }
+        
+        ctx.shadowOffsetX = 0
+        ctx.shadowOffsetY = 0
+        ctx.textAlign = "center"
+        ctx.textBaseline = "middle"
+        ctx.fillText(s.char, 0, 0)
+        ctx.restore()
+    })
+    
+    // grietas de fondo
+    cracks.forEach((c, i) => {
+        let x = c.x
+        let y = c.y
+        
+        ctx.beginPath()
+        ctx.moveTo(x, y)
+        
+        for(let j = 0; j < c.length; j += 8) {
+            x += Math.cos(c.angle) * 7 + (Math.random() - 0.5) * 8
+            y += Math.sin(c.angle) * 7 + (Math.random() - 0.5) * 8
+            ctx.lineTo(x, y)
+        }
+        
+        ctx.strokeStyle = modoCaos ? 
+            `rgba(${Math.random()*255}, ${Math.random()*100}, 255, 0.5)` : 
+            'rgba(255, 255, 255, 0.3)'
+        ctx.lineWidth = modoCaos ? 1.8 : 1.2
+        ctx.stroke()
+        
+        c.life--
+        if(c.life <= 0) cracks.splice(i, 1)
+    })
+    
+    // grietas del portal
+    portalCracks.forEach((b, i) => {
+        let x = cx
+        let y = cy
+        
+        ctx.beginPath()
+        ctx.moveTo(cx, cy)
+        
+        for(let j = 0; j < b.length; j += 8) {
+            x += Math.cos(b.angle) * 7 + (Math.random() - 0.5) * 8
+            y += Math.sin(b.angle) * 7 + (Math.random() - 0.5) * 8
+            ctx.lineTo(x, y)
+        }
+        
+        ctx.strokeStyle = modoCaos ? 
+            `rgba(255, ${Math.random()*100}, ${Math.random()*255}, 0.6)` : 
+            'rgba(255, 255, 255, 0.5)'
+        ctx.lineWidth = modoCaos ? 2.2 : 1.5
+        ctx.stroke()
+        
+        b.life--
+        if(b.life <= 0) portalCracks.splice(i, 1)
+    })
+    
+    requestAnimationFrame(draw)
+}
+
+draw()
+
+// mensaje después de 2 minutos
+setTimeout(() => {
+    if(!mensajeTemporalMostrado) {
+        mostrarMensajeTemporal()
+    }
+}, 120000) // 2 minutos = 120000 milisegundos
+
+/* palabras secretas */
+function activarCaos() {
+    modoCaos = true
+    modoVortex = false
+    
+    // reproducir sonido de portal abriéndose
+    const audioPortal = new Audio('Portal abriendose.mp3')
+    audioPortal.play()
+    
+    document.querySelector('.portalBg').classList.remove('vortex')
+    document.querySelector('.portalBg').classList.add('caos')
+    document.getElementById('mensajeCaos').style.display = "block"
+    document.getElementById('mensaje').style.display = "none"
+    
+    if(intervaloCaos) clearInterval(intervaloCaos)
+    intervaloCaos = setInterval(spawnCaosCracks, 500)
+    
+    setTimeout(() => {
+        // pantalla en negro por 5 segundos
+        document.body.style.transition = 'background 1s ease-in-out'
+        document.body.style.background = 'black'
+        document.body.style.overflow = 'hidden'
+        
+        // ocultar todo
+        document.getElementById('glass').style.display = 'none'
+        document.querySelector('.portalContainer').style.display = 'none'
+        document.getElementById('mensajeCaos').style.display = 'none'
+        
+        // reproducir sonido en pantalla negra
+        const audioNosVemos = new Audio('Nos estaremos viendo.mp3')
+        audioNosVemos.play()
+        
+        setTimeout(() => {
+            // restaurar todo pero mantener modo caos
+            document.body.style.background = ''
+            document.body.style.overflow = ''
+            document.getElementById('glass').style.display = 'block'
+            document.querySelector('.portalContainer').style.display = 'flex'
+            document.getElementById('mensajeCaos').style.display = 'none'
+            
+            // mantener portal en modo caos pero sin intervalo
+            document.querySelector('.portalBg').classList.add('caos')
+            modoCaos = true
+            
+            // restaurar foco del input
+            document.getElementById('palabra').focus()
+            
+            // mostrar alertas de peligro
+            mostrarAlertasPeligro()
+            
+            // después de 5 segundos, explotar portal y reiniciar
+            setTimeout(() => {
+                explosionPortal()
+            }, 5000)
+        }, 5000)
+    }, 2000)
+}
+
+function desactivarCaos() {
+    modoCaos = false
+    document.querySelector('.portalBg').classList.remove('caos')
+    document.getElementById('mensajeCaos').style.display = "none"
+    clearInterval(intervaloCaos)
+}
+
+function mostrarAlertasPeligro() {
+    // reproducir sonido de emergencia
+    const audioEmergencia = new Audio('Emergencia.mp3')
+    audioEmergencia.play().catch(() => {})
+    
+    // crear múltiples alertas de peligro
+    for(let i = 0; i < 5; i++) {
+        setTimeout(() => {
+            const alerta = document.createElement('div')
+            alerta.innerHTML = '⚠️ PORTAL INESTABLE ⚠️'
+            alerta.style.position = 'fixed'
+            alerta.style.top = Math.random() * 80 + 10 + '%'
+            alerta.style.left = Math.random() * 80 + 10 + '%'
+            alerta.style.color = 'red'
+            alerta.style.fontSize = '24px'
+            alerta.style.fontWeight = 'bold'
+            alerta.style.textShadow = '0 0 10px red, 0 0 20px red'
+            alerta.style.animation = 'parpadeoAlerta 0.5s infinite'
+            alerta.style.zIndex = '1000'
+            alerta.style.pointerEvents = 'none'
+            
+            document.body.appendChild(alerta)
+            
+            // eliminar alerta después de un tiempo
+            setTimeout(() => alerta.remove(), 3000)
+        }, i * 800)
+    }
+    
+    // símbolos de peligro adicionales
+    for(let i = 0; i < 8; i++) {
+        setTimeout(() => {
+            const peligro = document.createElement('div')
+            peligro.innerHTML = '⚠️'
+            peligro.style.position = 'fixed'
+            peligro.style.top = Math.random() * 90 + 5 + '%'
+            peligro.style.left = Math.random() * 90 + 5 + '%'
+            peligro.style.fontSize = '40px'
+            peligro.style.color = 'red'
+            peligro.style.textShadow = '0 0 15px red'
+            peligro.style.animation = 'rotarPeligro 2s linear infinite'
+            peligro.style.zIndex = '999'
+            peligro.style.pointerEvents = 'none'
+            
+            document.body.appendChild(peligro)
+            
+            setTimeout(() => peligro.remove(), 4000)
+        }, i * 600)
+    }
+}
+
+function mostrarImagenConInput(nombreArchivo, tipo) {
+    // Reproducir sonido de páginas solo una vez
+    const audioPaginas = new Audio('Paginas.mp3')
+    audioPaginas.play().catch(() => {})
+    
+    // crear contenedor para la imagen
+    const contenedor = document.createElement('div')
+    contenedor.style.position = 'fixed'
+    contenedor.style.top = '0'
+    contenedor.style.left = '0'
+    contenedor.style.width = '100vw'
+    contenedor.style.height = '100vh'
+    contenedor.style.backgroundColor = 'rgba(0, 0, 0, 0.95)'
+    contenedor.style.zIndex = '1000'
+    contenedor.style.display = 'flex'
+    contenedor.style.flexDirection = 'column'
+    contenedor.style.justifyContent = 'center'
+    contenedor.style.alignItems = 'center'
+    contenedor.style.opacity = '0'
+    contenedor.style.transform = 'scale(0.8)'
+    contenedor.style.transition = 'all 0.5s ease-out'
+    contenedor.style.cursor = 'pointer'
+    
+    // crear imagen
+    const imagen = document.createElement('img')
+    imagen.src = nombreArchivo
+    imagen.style.maxWidth = '80vw'
+    imagen.style.maxHeight = '60vh'
+    imagen.style.objectFit = 'contain'
+    imagen.style.borderRadius = '10px'
+    imagen.style.boxShadow = '0 0 50px rgba(255, 255, 255, 0.3)'
+    imagen.style.transform = 'scale(0.9) rotate(5deg)'
+    imagen.style.transition = 'all 0.6s ease-out'
+    imagen.style.marginBottom = '30px'
+    imagen.style.pointerEvents = 'none'
+    
+    // crear contenedor para el input
+    const inputContainer = document.createElement('div')
+    inputContainer.style.display = 'flex'
+    inputContainer.style.flexDirection = 'column'
+    inputContainer.style.alignItems = 'center'
+    inputContainer.style.pointerEvents = 'none'
+    
+    // crear label
+    const label = document.createElement('label')
+    label.textContent = 'Escribe tu respuesta:'
+    label.style.color = 'white'
+    label.style.fontSize = '18px'
+    label.style.marginBottom = '10px'
+    label.style.fontFamily = "'Courier New', monospace"
+    label.style.textShadow = '0 0 10px rgba(255, 255, 255, 0.5)'
+    
+    // crear input
+    const input = document.createElement('input')
+    input.type = 'text'
+    input.placeholder = '...'
+    input.style.background = 'transparent'
+    input.style.border = '1px solid rgba(255, 255, 255, 0.3)'
+    input.style.outline = 'none'
+    input.style.color = 'white'
+    input.style.fontFamily = "'Courier New', monospace"
+    input.style.fontSize = '20px'
+    input.style.textAlign = 'center'
+    input.style.width = '200px'
+    input.style.padding = '8px'
+    input.style.borderRadius = '5px'
+    input.style.pointerEvents = 'auto'
+    
+    // agregar elementos al contenedor de input
+    inputContainer.appendChild(label)
+    inputContainer.appendChild(input)
+    
+    // imagen y input al contenedor principal
+    contenedor.appendChild(imagen)
+    contenedor.appendChild(inputContainer)
+    
+    // contenedor al body
+    document.body.appendChild(contenedor)
+    
+    // Animación de aparición
+    setTimeout(() => {
+        contenedor.style.opacity = '1'
+        contenedor.style.transform = 'scale(1)'
+        imagen.style.transform = 'scale(1) rotate(0deg)'
+        input.focus()
+    }, 50)
+    
+    // Evento para cerrar al hacer clic fuera del input
+    contenedor.addEventListener('click', (e) => {
+        if(e.target !== input) {
+            contenedor.style.opacity = '0'
+            contenedor.style.transform = 'scale(0.8)'
+            imagen.style.transform = 'scale(0.9) rotate(-5deg)'
+            setTimeout(() => {
+                contenedor.remove()
+            }, 300)
+        }
+    })
+    
+    // Evento para el input
+    input.addEventListener('keydown', (e) => {
+        if(e.key === "Enter") {
+            let respuesta = input.value.toLowerCase()
+            
+            if(tipo === "acertijo" && respuesta === "montaña rusa") {
+                // cerrar imagen actual
+                contenedor.style.opacity = '0'
+                contenedor.style.transform = 'scale(0.8)'
+                imagen.style.transform = 'scale(0.9) rotate(-5deg)'
+                setTimeout(() => {
+                    contenedor.remove()
+                    // mostrar imagen del acertijo código
+                    mostrarImagenDimensional("Acertijo codigo.png")
+                }, 300)
+            } else {
+                // respuesta incorrecta - efecto de error
+                input.style.borderColor = 'red'
+                input.style.animation = 'shake 0.5s'
+                setTimeout(() => {
+                    input.style.borderColor = 'rgba(255, 255, 255, 0.3)'
+                    input.style.animation = ''
+                }, 500)
+            }
+        }
+    })
+    
+    // prevenir propagación del clic del input
+    input.addEventListener('click', (e) => {
+        e.stopPropagation()
+    })
+}
+
+function mostrarImagenDimensional(nombreArchivo) {
+    // Reproducir sonido de páginas solo una vez
+    const audioPaginas = new Audio('Paginas.mp3')
+    audioPaginas.play().catch(() => {})
+    
+    // crear contenedor para la imagen
+    const contenedor = document.createElement('div')
+    contenedor.style.position = 'fixed'
+    contenedor.style.top = '0'
+    contenedor.style.left = '0'
+    contenedor.style.width = '100vw'
+    contenedor.style.height = '100vh'
+    contenedor.style.backgroundColor = 'rgba(0, 0, 0, 0.9)'
+    contenedor.style.zIndex = '1000'
+    contenedor.style.display = 'flex'
+    contenedor.style.justifyContent = 'center'
+    contenedor.style.alignItems = 'center'
+    contenedor.style.opacity = '0'
+    contenedor.style.transform = 'scale(0.8)'
+    contenedor.style.transition = 'all 0.5s ease-out'
+    contenedor.style.cursor = 'pointer'
+    
+    // crear imagen
+    const imagen = document.createElement('img')
+    imagen.src = nombreArchivo
+    imagen.style.maxWidth = '90vw'
+    imagen.style.maxHeight = '90vh'
+    imagen.style.objectFit = 'contain'
+    imagen.style.borderRadius = '10px'
+    imagen.style.boxShadow = '0 0 50px rgba(255, 255, 255, 0.3)'
+    imagen.style.transform = 'scale(0.9) rotate(5deg)'
+    imagen.style.transition = 'all 0.6s ease-out'
+    
+    // imagen al contenedor
+    contenedor.appendChild(imagen)
+    
+    // contenedor al body
+    document.body.appendChild(contenedor)
+    
+    // Animación de aparición
+    setTimeout(() => {
+        contenedor.style.opacity = '1'
+        contenedor.style.transform = 'scale(1)'
+        imagen.style.transform = 'scale(1) rotate(0deg)'
+    }, 50)
+    
+    // Evento para cerrar al hacer clic
+    contenedor.addEventListener('click', () => {
+        contenedor.style.opacity = '0'
+        contenedor.style.transform = 'scale(0.8)'
+        imagen.style.transform = 'scale(0.9) rotate(-5deg)'
+        setTimeout(() => {
+            contenedor.remove()
+        }, 300)
+    })
+}
+
+function explosionPortal() {
+    const portal = document.querySelector('.portalBg')
+    const container = document.querySelector('.portalContainer')
+    
+    //  múltiples partículas de explosión
+    for(let i = 0; i < 20; i++) {
+        const particula = document.createElement('div')
+        particula.style.position = 'fixed'
+        particula.style.width = '20px'
+        particula.style.height = '20px'
+        particula.style.background = `hsl(${Math.random() * 360}, 100%, 50%)`
+        particula.style.borderRadius = '50%'
+        particula.style.left = '50%'
+        particula.style.top = '50%'
+        particula.style.transform = 'translate(-50%, -50%)'
+        particula.style.pointerEvents = 'none'
+        particula.style.zIndex = '1000'
+        particula.style.boxShadow = `0 0 20px hsl(${Math.random() * 360}, 100%, 50%)`
+        
+        document.body.appendChild(particula)
+        
+        // Animar partícula
+        const angulo = (Math.PI * 2 * i) / 20
+        const velocidad = 300 + Math.random() * 200
+        const destinoX = Math.cos(angulo) * velocidad
+        const destinoY = Math.sin(angulo) * velocidad
+        
+        particula.style.transition = 'all 0.3s ease-out'
+        particula.style.transform = `translate(calc(-50% + ${destinoX}px), calc(-50% + ${destinoY}px)) scale(0)`
+        particula.style.opacity = '0'
+        
+        setTimeout(() => particula.remove(), 300)
+    }
+    
+    // Efecto de explosión 
+    portal.style.transition = 'all 0.2s ease-out'
+    portal.style.transform = 'scale(5) rotate(1440deg)'
+    portal.style.opacity = '0'
+    portal.style.filter = 'brightness(5) saturate(2)'
+    
+    // Pantalla blanca 
+    document.body.style.transition = 'background 0.1s'
+    document.body.style.background = 'white'
+    
+    // Sonido de explosión
+    const audioExplosion = new Audio('Explosion.mp3')
+    audioExplosion.play().catch(() => {})
+    
+    // ocultar todo
+    document.getElementById('palabra').style.display = 'none'
+    document.getElementById('glass').style.display = 'none'
+    
+// Reiniciar página
+    setTimeout(() => {
+        location.reload()
+    }, 1500)
+}
+
+function enter(e) {
+    if(e.key === "Enter") {
+        let palabra = document.getElementById("palabra").value
+        let codigoEncontrado = false
+        
+        if(palabra.toLowerCase() === "prueba") {
+            mostrarMensajePrueba()
+            codigoEncontrado = true
+        }
+        
+        if(palabra === "Lumi") {
+            window.location.href = "https://youtu.be/R6YsxglsVdI"
+            codigoEncontrado = true
+        }
+        
+        if(palabra.toLowerCase() === "coliseo") {
+            window.location.href = "https://youtu.be/DWqcmg1O9WA"
+            codigoEncontrado = true
+        }
+        
+        if(palabra === "Entidad") {
+            mostrarImagenDimensional("Entidad.png")
+            codigoEncontrado = true
+        }
+        
+        if(palabra === "20/7") {
+            mensajeTemporalMostrado = true // bloquear mensaje temporal
+            activarCaos()
+            codigoEncontrado = true
+        }
+        
+        // IMÁGENES DIMENSIONALES
+        if(palabra.toLowerCase() === "cristales" || palabra.toLowerCase() === "critales" || 
+           palabra.toLowerCase() === "dimension de cristal" || palabra.toLowerCase() === "dimension de critales") {
+            mostrarImagenDimensional("Cristales.png")
+            codigoEncontrado = true
+        }
+        
+        if(palabra.toLowerCase() === "vacio" || palabra.toLowerCase() === "dimension del vacio") {
+            mostrarImagenDimensional("Vacio.png")
+            codigoEncontrado = true
+        }
+        
+        if(palabra.toLowerCase() === "eco" || palabra.toLowerCase() === "dimension del eco") {
+            mostrarImagenDimensional("Eco.png")
+            codigoEncontrado = true
+        }
+        
+        if(palabra.toLowerCase() === "predicador") {
+            mostrarImagenDimensional("Predicador.png")
+            codigoEncontrado = true
+        }
+        
+        if(palabra.toLowerCase() === "portal") {
+            mostrarVideo("portal.mp4")
+            codigoEncontrado = true
+        }
+        
+        if(palabra.toLowerCase() === "?") {
+            mostrarVideo("Segunda invocacion.mp4")
+            codigoEncontrado = true
+        }
+        
+        if(palabra.toLowerCase() === "invocacion") {
+            mostrarVideo("invocacion.mp4")
+            codigoEncontrado = true
+        }
+        
+        if(palabra.toLowerCase() === "dios del acertijo" || palabra.toLowerCase() === "acertijo") {
+            mostrarImagenConInput("Dios del acertijo.png", "acertijo")
+            codigoEncontrado = true
+        }
+        
+        if(palabra === "22/01/2026") {
+            mostrarMensajeComienzo()
+            codigoEncontrado = true
+        }
+        
+        if(palabra.toLowerCase() === "oz") {
+            cambiarCursorGuadana()
+            codigoEncontrado = true
+        }
+        
+        if(palabra.toLowerCase() === "german" || palabra.toLowerCase() === "geruada_z") {
+            simularCrasheo()
+            codigoEncontrado = true
+        }
+        
+        // mostrar mensaje de error si no se encontró ningún código
+        if(!codigoEncontrado && palabra.trim() !== "") {
+            mostrarMensajeError()
+        }
+        
+        // limpiar 
+        document.getElementById("palabra").value = ""
+    }
+}
+
+function mostrarMensajeError() {
+    const mensajeError = document.getElementById("mensajeError")
+    mensajeError.style.display = "block"
+    
+    // ocultar después de 2 segundos
+    setTimeout(() => {
+        mensajeError.style.display = "none"
+    }, 2000)
+}
+
+function cambiarCursorGuadana() {
+    // cambiar el cursor del body a una imagen de guadaña
+    document.body.style.cursor = "url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"32\" height=\"32\" viewBox=\"0 0 32 32\"><path fill=\"white\" d=\"M16 2l-4 4 8 8-8 8 4 4 12-12-12-12z\"/><rect fill=\"white\" x=\"14\" y=\"20\" width=\"4\" height=\"12\"/></svg>'), auto"
+}
+
+function mostrarMensajePrueba() {
+    // mostrar mensaje "funciona"
+    const mensajePrueba = document.createElement('div')
+    mensajePrueba.textContent = 'funciona'
+    mensajePrueba.style.position = 'fixed'
+    mensajePrueba.style.top = '20px'
+    mensajePrueba.style.left = '50%'
+    mensajePrueba.style.transform = 'translateX(-50%)'
+    mensajePrueba.style.color = 'white'
+    mensajePrueba.style.fontSize = '18px'
+    mensajePrueba.style.fontFamily = "'Courier New', monospace"
+    mensajePrueba.style.textShadow = '0 0 10px rgba(255, 255, 255, 0.5)'
+    mensajePrueba.style.zIndex = '1000'
+    mensajePrueba.style.opacity = '0'
+    mensajePrueba.style.transition = 'opacity 0.5s ease-in-out'
+    mensajePrueba.style.pointerEvents = 'none'
+    
+    document.body.appendChild(mensajePrueba)
+    
+    // animación de aparición
+    setTimeout(() => {
+        mensajePrueba.style.opacity = '1'
+    }, 100)
+    
+    // ocultar después de 2 segundos
+    setTimeout(() => {
+        mensajePrueba.style.opacity = '0'
+        setTimeout(() => {
+            mensajePrueba.remove()
+        }, 500)
+    }, 2000)
+}
+
+function mostrarVideo(nombreVideo) {
+    // crear contenedor para el video
+    const contenedor = document.createElement('div')
+    contenedor.style.position = 'fixed'
+    contenedor.style.top = '0'
+    contenedor.style.left = '0'
+    contenedor.style.width = '100vw'
+    contenedor.style.height = '100vh'
+    contenedor.style.backgroundColor = 'rgba(0, 0, 0, 0.95)'
+    contenedor.style.zIndex = '1000'
+    contenedor.style.display = 'flex'
+    contenedor.style.justifyContent = 'center'
+    contenedor.style.alignItems = 'center'
+    contenedor.style.opacity = '0'
+    contenedor.style.transform = 'scale(0.8)'
+    contenedor.style.transition = 'all 0.5s ease-out'
+    contenedor.style.cursor = 'pointer'
+    
+    // crear el video
+    const video = document.createElement('video')
+    video.src = nombreVideo
+    video.style.maxWidth = '90vw'
+    video.style.maxHeight = '90vh'
+    video.style.objectFit = 'contain'
+    video.style.borderRadius = '10px'
+    video.style.boxShadow = '0 0 50px rgba(255, 255, 255, 0.3)'
+    video.style.transform = 'scale(0.9) rotate(5deg)'
+    video.style.transition = 'all 0.6s ease-out'
+    video.controls = true
+    video.autoplay = true
+    
+    // video al contenedor
+    contenedor.appendChild(video)
+    
+    // contenedor al body
+    document.body.appendChild(contenedor)
+    
+    // Animación de aparición
+    setTimeout(() => {
+        contenedor.style.opacity = '1'
+        contenedor.style.transform = 'scale(1)'
+        video.style.transform = 'scale(1) rotate(0deg)'
+    }, 50)
+    
+    // Evento para cerrar al hacer clic fuera del video
+    contenedor.addEventListener('click', (e) => {
+        if(e.target !== video) {
+            video.pause()
+            contenedor.style.opacity = '0'
+            contenedor.style.transform = 'scale(0.8)'
+            video.style.transform = 'scale(0.9) rotate(-5deg)'
+            setTimeout(() => {
+                contenedor.remove()
+            }, 300)
+        }
+    })
+    
+    // prevenir propagación del clic del video
+    video.addEventListener('click', (e) => {
+        e.stopPropagation()
+    })
+}
+
+function mostrarMensajeTemporal() {
+    // crear mensaje temporal debajo del portal
+    const mensajeTemporal = document.createElement('div')
+    mensajeTemporal.textContent = '¿Cuando volveremos?'
+    mensajeTemporal.style.position = 'fixed'
+    mensajeTemporal.style.bottom = '100px'
+    mensajeTemporal.style.left = '50%'
+    mensajeTemporal.style.transform = 'translateX(-50%)'
+    mensajeTemporal.style.color = 'white'
+    mensajeTemporal.style.fontSize = '20px'
+    mensajeTemporal.style.fontFamily = "'Courier New', monospace"
+    mensajeTemporal.style.textShadow = '0 0 15px rgba(255, 255, 255, 0.5)'
+    mensajeTemporal.style.zIndex = '1000'
+    mensajeTemporal.style.opacity = '0'
+    mensajeTemporal.style.transition = 'opacity 1s ease-in-out'
+    mensajeTemporal.style.animation = 'temblorSutil 2s ease-in-out infinite'
+    mensajeTemporal.style.pointerEvents = 'none'
+    
+    document.body.appendChild(mensajeTemporal)
+    
+    // animación de aparición
+    setTimeout(() => {
+        mensajeTemporal.style.opacity = '1'
+    }, 100)
+    
+    // ocultar después de 10 segundos
+    setTimeout(() => {
+        mensajeTemporal.style.opacity = '0'
+        setTimeout(() => {
+            mensajeTemporal.remove()
+        }, 1000)
+    }, 10000)
+}
+
+function mostrarMensajeComienzo() {
+    // crear contenedor para el mensaje
+    const contenedor = document.createElement('div')
+    contenedor.style.position = 'fixed'
+    contenedor.style.top = '0'
+    contenedor.style.left = '0'
+    contenedor.style.width = '100vw'
+    contenedor.style.height = '100vh'
+    contenedor.style.backgroundColor = 'black'
+    contenedor.style.zIndex = '2000'
+    contenedor.style.display = 'flex'
+    contenedor.style.justifyContent = 'center'
+    contenedor.style.alignItems = 'center'
+    contenedor.style.opacity = '0'
+    contenedor.style.transition = 'opacity 2s ease-in-out'
+    contenedor.style.cursor = 'pointer'
+    
+    // crear el mensaje
+    const mensaje = document.createElement('div')
+    mensaje.textContent = 'Fue el comienzo de todo....'
+    mensaje.style.color = 'white'
+    mensaje.style.fontSize = '48px'
+    mensaje.style.fontFamily = "'Courier New', monospace"
+    mensaje.style.textAlign = 'center'
+    mensaje.style.animation = 'temblorSutil 3s ease-in-out infinite'
+    mensaje.style.textShadow = '0 0 20px rgba(255, 255, 255, 0.3)'
+    mensaje.style.letterSpacing = '2px'
+    
+    // agregar mensaje al contenedor
+    contenedor.appendChild(mensaje)
+    
+    // contenedor al body
+    document.body.appendChild(contenedor)
+    
+    // Animación de aparición
+    setTimeout(() => {
+        contenedor.style.opacity = '1'
+    }, 100)
+    
+    // Evento para cerrar al hacer clic
+    contenedor.addEventListener('click', () => {
+        contenedor.style.opacity = '0'
+        setTimeout(() => {
+            contenedor.remove()
+        }, 2000)
+    })
+}
+
+function simularCrasheo() {
+    // efectos visuales de crasheo
+    document.body.style.transition = 'all 0.1s'
+    document.body.style.filter = 'invert(1) hue-rotate(180deg)'
+    
+    // pantalla roja de error
+    setTimeout(() => {
+        document.body.style.background = 'red'
+        document.body.style.filter = 'blur(2px) brightness(2)'
+    }, 100)
+    
+    //  múltiples errores en pantalla
+    for(let i = 0; i < 15; i++) {
+        setTimeout(() => {
+            const error = document.createElement('div')
+            error.innerHTML = 'ERROR: SYSTEM_FAILURE_0x' + Math.random().toString(16).substr(2, 8).toUpperCase()
+            error.style.position = 'fixed'
+            error.style.top = Math.random() * 100 + '%'
+            error.style.left = Math.random() * 100 + '%'
+            error.style.color = 'white'
+            error.style.fontSize = '14px'
+            error.style.fontFamily = 'monospace'
+            error.style.zIndex = '9999'
+            error.style.textShadow = '0 0 5px red'
+            error.style.opacity = '0'
+            error.style.transition = 'opacity 0.2s'
+            
+            document.body.appendChild(error)
+            
+            setTimeout(() => {
+                error.style.opacity = '1'
+            }, 50)
+            
+            setTimeout(() => {
+                error.remove()
+            }, 2000)
+        }, i * 100)
+    }
+    
+    // sonido de error 
+    const audioError = new Audio('error.mp3')
+    audioError.play().catch(() => {})
+    
+    // mensaje final de crasheo
+    setTimeout(() => {
+        const crashMsg = document.createElement('div')
+        crashMsg.innerHTML = 'SYSTEM CRASHED<br>MEMORY CORRUPTION DETECTED<br>CLOSING...'
+        crashMsg.style.position = 'fixed'
+        crashMsg.style.top = '50%'
+        crashMsg.style.left = '50%'
+        crashMsg.style.transform = 'translate(-50%, -50%)'
+        crashMsg.style.color = 'red'
+        crashMsg.style.fontSize = '24px'
+        crashMsg.style.fontFamily = 'monospace'
+        crashMsg.style.textAlign = 'center'
+        crashMsg.style.zIndex = '10000'
+        crashMsg.style.textShadow = '0 0 20px red'
+        crashMsg.style.fontWeight = 'bold'
+        
+        document.body.appendChild(crashMsg)
+        
+        // cerrar página después del crasheo
+        setTimeout(() => {
+            window.close()
+            // si no se puede cerrar, redirigir a about:blank
+            setTimeout(() => {
+                window.location.href = 'about:blank'
+            }, 100)
+        }, 2000)
+    }, 1500)
+}
+
+// Redimensionar
+window.addEventListener('resize', () => {
+    canvas.width = window.innerWidth
+    canvas.height = window.innerHeight
+    initStars()
+    initSymbols()
+})
+
+// Detección de clics en símbolos especiales
+canvas.addEventListener('click', (e) => {
+    const rect = canvas.getBoundingClientRect()
+    const clickX = e.clientX - rect.left
+    const clickY = e.clientY - rect.top
+    
+    // buscar símbolos especiales cerca del clic
+    symbols.forEach((s, index) => {
+        if(s.isSpecial) {
+            const distance = Math.sqrt(Math.pow(clickX - s.x, 2) + Math.pow(clickY - s.y, 2))
+            if(distance < s.size * 1.5) { // área de clic más grande
+                mostrarImagenDimensional("Ultima carta.png")
+                // eliminar el símbolo especial después del clic
+                symbols.splice(index, 1)
+                return
+            }
+        }
+    })
+})
+
+// FANTASMA CADA MINUTO
+function mostrarFantasma() {
+    const fantasma = document.createElement('div')
+    fantasma.innerHTML = '<img src="ghost.png" style="width: 150px; height: auto; opacity: 0.3; filter: blur(2px);">'
+    fantasma.style.position = 'fixed'
+    fantasma.style.top = '50%'
+    fantasma.style.left = '50%'
+    fantasma.style.transform = 'translate(-50%, -50%)'
+    fantasma.style.pointerEvents = 'none'
+    fantasma.style.zIndex = '999'
+    fantasma.style.animation = 'desvanecerFantasma 4s ease-in-out'
+    
+    document.body.appendChild(fantasma)
+    
+    setTimeout(() => {
+        fantasma.remove()
+    }, 4000)
+}
+
+
+const estiloFantasma = document.createElement('style')
+estiloFantasma.textContent = `
+    @keyframes desvanecerFantasma {
+        0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+        20% { opacity: 0.6; transform: translate(-50%, -50%) scale(1); }
+        80% { opacity: 0.4; transform: translate(-50%, -50%) scale(1); }
+        100% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+    }
+    
+    @keyframes parpadeoAlerta {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.3; }
+    }
+    
+    @keyframes rotarPeligro {
+        0% { transform: rotate(0deg) scale(1); }
+        50% { transform: rotate(180deg) scale(1.2); }
+        100% { transform: rotate(360deg) scale(1); }
+    }
+    
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+        20%, 40%, 60%, 80% { transform: translateX(5px); }
+    }
+    
+    @keyframes temblorSutil {
+        0%, 100% { transform: translate(0, 0); }
+        25% { transform: translate(1px, -1px); }
+        50% { transform: translate(-1px, 1px); }
+        75% { transform: translate(1px, 1px); }
+    }
+    
+    @keyframes parpadeoError {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+    }
+`
+document.head.appendChild(estiloFantasma)
+
+</script>
+
+</body>
+</html>
